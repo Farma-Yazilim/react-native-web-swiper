@@ -4,31 +4,29 @@ import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 
 import { renderNode } from './renderNode';
 
-const Badge = props => {
-  const {
-    containerStyle,
-    textStyle,
-    badgeStyle,
-    onPress,
-    Component = onPress ? TouchableOpacity : View,
-    value,
-    theme,
-    status,
-    ...attributes
-  } = props;
-
+const Badge = ({
+  containerStyle,
+  textStyle,
+  badgeStyle,
+  onPress,
+  Component = onPress ? TouchableOpacity : View,
+  value,
+  theme,
+  status = "primary",
+  ...attributes
+}) => {
   const element = renderNode(Text, value, {
-    style: StyleSheet.flatten([styles.text, textStyle && textStyle]),
+    style: StyleSheet.flatten([styles.text, textStyle]),
   });
 
   return (
-    <View style={StyleSheet.flatten([containerStyle && containerStyle])}>
+    <View style={StyleSheet.flatten([containerStyle])}>
       <Component
         {...attributes}
         style={StyleSheet.flatten([
           styles.badge(theme, status),
           !element && styles.miniBadge,
-          badgeStyle && badgeStyle,
+          badgeStyle,
         ])}
         onPress={onPress}
       >
@@ -39,30 +37,22 @@ const Badge = props => {
 };
 
 Badge.propTypes = {
-  containerStyle: PropTypes.shape({
-    style: PropTypes.any,
-  }),
-  badgeStyle: PropTypes.shape({
-    style: PropTypes.any,
-  }),
-  textStyle: PropTypes.shape({
-    style: PropTypes.any,
-  }),
+  containerStyle: PropTypes.object,
+  badgeStyle: PropTypes.object,
+  textStyle: PropTypes.object,
   value: PropTypes.node,
   onPress: PropTypes.func,
-  Component: PropTypes.func,
-  theme: PropTypes.object,
+  Component: PropTypes.elementType,
+  theme: PropTypes.shape({
+    colors: PropTypes.object.isRequired,
+  }).isRequired,
   status: PropTypes.oneOf(['primary', 'success', 'warning', 'error']),
-};
-
-Badge.defaultProps = {
-  status: 'primary',
 };
 
 const size = 18;
 const miniSize = 8;
 
-const styles = {
+const styles = StyleSheet.create({
   badge: (theme, status) => ({
     alignSelf: 'center',
     minWidth: size,
@@ -70,7 +60,7 @@ const styles = {
     borderRadius: size / 2,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors[status],
+    backgroundColor: theme?.colors[status],
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: '#fff',
   }),
@@ -86,6 +76,6 @@ const styles = {
     color: 'white',
     paddingHorizontal: 4,
   },
-};
+});
 
 export { Badge };
